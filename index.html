@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CurrencyFlow</title>
+
+<style>
+:root {
+    --bg: #0b1020;
+    --card: rgba(255,255,255,.09);
+    --card2: rgba(255,255,255,.06);
+    --text: #ffffff;
+    --muted: #aab2c5;
+    --accent: #7c5cff;
+    --accent2: #b65cff;
+    --border: rgba(255,255,255,.12);
+    --input: rgba(255,255,255,.08);
+    --shadow: 0 30px 80px rgba(0,0,0,.35);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    color: var(--text);
+    font-family: Inter, Arial, sans-serif;
+
+    background:
+        radial-gradient(circle at 10% 10%, var(--accent), transparent 30%),
+        radial-gradient(circle at 90% 90%, var(--accent2), transparent 30%),
+        var(--bg);
+
+    transition: background .4s, color .4s;
+    padding: 20px;
+}
+
+button,
+select,
+input {
+    font: inherit;
+}
+
+.app {
+    width: 100%;
+    max-width: 1050px;
+    margin: auto;
+}
+
+/* HEADER */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.logo {
+    font-size: 25px;
+    font-weight: 900;
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.control {
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    border-radius: 14px;
+    padding: 11px 14px;
+    cursor: pointer;
+    backdrop-filter: blur(15px);
+}
+
+.control option {
+    background: #151a2b;
+    color: white;
+}
+
+/* HERO */
+
+.hero {
+    text-align: center;
+    margin: 35px 0;
+}
+
+.hero h1 {
+    font-size: clamp(38px, 7vw, 72px);
+    line-height: 1;
+    margin-bottom: 15px;
+}
+
+.hero p {
+    color: var(--muted);
+    font-size: 18px;
+}
+
+/* CARD */
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 32px;
+    padding: 30px;
+
+    backdrop-filter: blur(25px);
+    box-shadow: var(--shadow);
+}
+
+/* GRID */
+
+.converter {
+    display: grid;
+    grid-template-columns: 1fr 70px 1fr;
+    gap: 15px;
+    align-items: end;
+}
+
+.field label {
+    display: block;
+    margin-bottom: 9px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.input-wrap {
+    position: relative;
+}
+
+.input-wrap input,
+.currency-select {
+    width: 100%;
+    min-height: 58px;
+
+    background: var(--input);
+    color: var(--text);
+
+    border: 1px solid var(--border);
+    border-radius: 17px;
+    outline: none;
+
+    padding: 0 17px;
+    font-size: 17px;
+
+    transition: .2s;
+}
+
+.input-wrap input:focus,
+.currency-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(124,92,255,.15);
+}
+
+/* SELECT */
+
+.currency-select {
+    appearance: none;
+    cursor: pointer;
+    padding-right: 45px;
+
+    background-image:
+        linear-gradient(45deg, transparent 50%, white 50%),
+        linear-gradient(135deg, white 50%, transparent 50%);
+
+    background-position:
+        calc(100% - 20px) 25px,
+        calc(100% - 14px) 25px;
+
+    background-size: 6px 6px;
+    background-repeat: no-repeat;
+}
+
+/* SWAP */
+
+.swap {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+
+    border: 0;
+    cursor: pointer;
+
+    color: white;
+    font-size: 25px;
+
+    background: linear-gradient(
+        135deg,
+        var(--accent),
+        var(--accent2)
+    );
+
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+
+    transition: .3s;
+}
+
+.swap:hover {
+    transform: rotate(180deg) scale(1.08);
+}
+
+/* RESULT */
+
+.result {
+    margin-top: 25px;
+
+    border-radius: 24px;
+    padding: 25px;
+
+    text-align: center;
+
+    background: var(--card2);
+    border: 1px solid var(--border);
+}
+
+.result-label {
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.result-number {
+    font-size: clamp(35px, 6vw, 55px);
+    font-weight: 900;
+    word-break: break-word;
+}
+
+.rate {
+    margin-top: 10px;
+    color: var(--muted);
+}
+
+.updated {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* SEARCH */
+
+.search {
+    margin-top: 20px;
+}
+
+.search input {
+    width: 100%;
+    padding: 14px 17px;
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+
+    background: var(--input);
+    color: var(--text);
+    outline: none;
+}
+
+/* STATUS */
+
+.status {
+    margin-top: 15px;
+    min-height: 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* FOOTER */
+
+.footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    margin-top: 20px;
+}
+
+/* THEMES */
+
+body.theme-ocean {
+    --bg: #06131c;
+    --accent: #00b4d8;
+    --accent2: #0077b6;
+}
+
+body.theme-forest {
+    --bg: #07150e;
+    --accent: #20c997;
+    --accent2: #198754;
+}
+
+body.theme-sunset {
+    --bg: #1c0b08;
+    --accent: #ff6b35;
+    --accent2: #ff3d81;
+}
+
+body.theme-royal {
+    --bg: #0c071b;
+    --accent: #8b5cf6;
+    --accent2: #ec4899;
+}
+
+body.theme-light {
+    --bg: #eef2ff;
+    --card: rgba(255,255,255,.72);
+    --card2: rgba(255,255,255,.55);
+    --text: #171923;
+    --muted: #646b7b;
+    --border: rgba(0,0,0,.1);
+    --input: rgba(255,255,255,.8);
+    --accent: #635bff;
+    --accent2: #9b51e0;
+    --shadow: 0 30px 80px rgba(30,40,80,.18);
+}
+
+/* MOBILE */
+
+@media(max-width:700px) {
+
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .controls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .converter {
+        grid-template-columns: 1fr;
+    }
+
+    .swap {
+        margin: auto;
+        transform: rotate(90deg);
+    }
+
+    .swap:hover {
+        transform: rotate(270deg) scale(1.08);
+    }
+
+    .card {
+        padding: 20px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header class="header">
+
+    <div class="logo">
+        💱 CurrencyFlow
+    </div>
+
+    <div class="controls">
+
+        <select
+            class="control"
+            id="language"
+            onchange="changeLanguage()">
+        </select>
+
+        <select
+            class="control"
+            id="theme"
+            onchange="changeTheme()">
+        </select>
+
+    </div>
+
+</header>
+
+
+<section class="hero">
+
+    <h1 id="title">
+        Курс валют
+    </h1>
+
+    <p id="subtitle">
+        Швидкий та точний конвертер валют
+    </p>
+
+</section>
+
+
+<main class="card">
+
+    <div class="converter">
+
+        <div class="field">
+
+            <label id="amountLabel">
+                Сума
+            </label>
+
+            <div class="input-wrap">
+
+                <input
+                    id="amount"
+                    type="number"
+                    value="100"
+                    min="0"
+                    step="any"
+                    oninput="convert()">
+
+            </div>
+
+        </div>
+
+
+        <button
+            class="swap"
+            onclick="swapCurrencies()"
+            title="Swap">
+
+            ⇄
+
+        </button>
+
+
+        <div class="field">
+
+            <label id="toLabel">
+                У валюту
+            </label>
+
+            <select
+                id="to"
+                class="currency-select"
+                onchange="convert()">
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div class="field" style="margin-top:18px">
+
+        <label id="fromLabel">
+            З валюти
+        </label>
+
+        <select
+            id="from"
+            class="currency-select"
+            onchange="convert()">
+        </select>
+
+    </div>
+
+
+    <div class="search">
+
+        <input
+            id="search"
+            type="text"
+            oninput="filterCurrencies()"
+            placeholder="Пошук валюти...">
+
+    </div>
+
+
+    <div class="result">
+
+        <div
+            class="result-label"
+            id="resultLabel">
+
+            Результат
+
+        </div>
+
+        <div
+            class="result-number"
+            id="result">
+
+            —
+
+        </div>
+
+        <div
+            class="rate"
+            id="rate">
+
+            —
+
+        </div>
+
+        <div
+            class="updated"
+            id="updated">
+
+            —
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="status"
+        id="status">
+
+        Завантаження курсів...
+
+    </div>
+
+</main>
+
+
+<div
+    class="footer"
+    id="footer">
+
+    Курси оновлюються автоматично
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   20 МОВ
+===================================================== */
+
+const languages = {
+
+    uk: {
+        flag: "🇺🇦",
+        name: "Українська",
+        title: "Курс валют",
+        subtitle: "Швидкий та точний конвертер валют",
+        amount: "Сума",
+        from: "З валюти",
+        to: "У валюту",
+        result: "Результат",
+        rate: "Курс",
+        search: "Пошук валюти...",
+        loading: "Завантаження курсів...",
+        error: "Не вдалося завантажити курс.",
+        updated: "Оновлено",
+        footer: "Курси оновлюються автоматично",
+        theme: "Тема"
+    },
+
+    en: {
+        flag: "🇬🇧",
+        name: "English",
+        title: "Currency Exchange",
+        subtitle: "Fast and accurate currency converter",
+        amount: "Amount",
+        from: "From",
+        to: "To",
+        result: "Result",
+        rate: "Rate",
+        search: "Search currency...",
+        loading: "Loading rates...",
+        error: "Failed to load rate.",
+        updated: "Updated",
+        footer: "Rates update automatically",
+        theme: "Theme"
+    },
+
+    pl: {
+        flag: "🇵🇱",
+        name: "Polski",
+        title: "Kurs walut",
+        subtitle: "Szybki i dokładny przelicznik walut",
+        amount: "Kwota",
+        from: "Z waluty",
+        to: "Na walutę",
+        result: "Wynik",
+        rate: "Kurs",
+        search: "Szukaj waluty...",
+        loading: "Ładowanie kursów...",
+        error: "Nie udało się pobrać kursu.",
+        updated: "Zaktualizowano",
+        footer: "Kursy aktualizują się automatycznie",
+        theme: "Motyw"
+    },
+
+    de: {
+        flag: "🇩🇪",
+        name: "Deutsch",
+        title: "Währungsrechner",
+        subtitle: "Schneller und genauer Währungsrechner",
+        amount: "Betrag",
+        from: "Von",
+        to: "Nach",
+        result: "Ergebnis",
+        rate: "Kurs",
+        search: "Währung suchen...",
+        loading: "Kurse werden geladen...",
+        error: "Kurs konnte nicht geladen werden.",
+        updated: "Aktualisiert",
+        footer: "Kurse werden automatisch aktualisiert",
+        theme: "Thema"
+    },
+
+    fr: {
+        flag: "🇫🇷",
+        name: "Français",
+        title: "Convertisseur de devises",
+        subtitle: "Convertisseur rapide et précis",
+        amount: "Montant",
+        from: "De",
+        to: "Vers",
+        result: "Résultat",
+        rate: "Taux",
+        search: "Rechercher une devise...",
+        loading: "Chargement des taux...",
+        error: "Impossible de charger le taux.",
+        updated: "Mis à jour",
+        footer: "Les taux sont mis à jour automatiquement",
+        theme: "Thème"
+    },
+
+    es: {
+        flag: "🇪🇸",
+        name: "Español",
+        title: "Conversor de divisas",
+        subtitle: "Conversor rápido y preciso",
+        amount: "Cantidad",
+        from: "Desde",
+        to: "A",
+        result: "Resultado",
+        rate: "Tipo de cambio",
+        search: "Buscar moneda...",
+        loading: "Cargando tipos...",
+        error: "No se pudo cargar el tipo.",
+        updated: "Actualizado",
+        footer: "Los tipos se actualizan automáticamente",
+        theme: "Tema"
+    },
+
+    it: {
+        flag: "🇮🇹",
+        name: "Italiano",
+        title: "Convertitore di valuta",
+        subtitle: "Convertitore rapido e preciso",
+        amount: "Importo",
+        from: "Da",
+        to: "A",
+        result: "Risultato",
+        rate: "Tasso",
+        search: "Cerca valuta...",
+        loading: "Caricamento tassi...",
+        error: "Impossibile caricare il tasso.",
+        updated: "Aggiornato",
+        footer: "I tassi vengono aggiornati automaticamente",
+        theme: "Tema"
+    },
+
+    pt: {
+        flag: "🇵🇹",
+        name: "Português",
+        title: "Conversor de moedas",
+        subtitle: "Conversor rápido e preciso",
+        amount: "Valor",
+        from: "De",
+        to: "Para",
+        result: "Resultado",
+        rate: "Taxa",
+        search: "Pesquisar moeda...",
+        loading: "Carregando taxas...",
+        error: "Não foi possível carregar a taxa.",
+        updated: "Atualizado",
+        footer: "As taxas são atualizadas automaticamente",
+        theme: "Tema"
+    },
+
+    nl: {
+        flag: "🇳🇱",
+        name: "Nederlands",
+        title: "Valutawisselaar",
+        subtitle: "Snelle en nauwkeurige valuta-omrekenaar",
+        amount: "Bedrag",
+        from: "Van",
+        to: "Naar",
+        result: "Resultaat",
+        rate: "Wisselkoers",
+        search: "Zoek valuta...",
+        loading: "Koersen laden...",
+        error: "Koers kon niet worden geladen.",
+        updated: "Bijgewerkt",
+        footer: "Koersen worden automatisch bijgewerkt",
+        theme: "Thema"
+    },
+
+    tr: {
+        flag: "🇹🇷",
+        name: "Türkçe",
+        title: "Döviz Çevirici",
+        subtitle: "Hızlı ve doğru para birimi dönüştürücü",
+        amount: "Miktar",
+        from: "Para birimi",
+        to: "Hedef",
+        result: "Sonuç",
+        rate: "Kur",
+        search: "Para birimi ara...",
+        loading: "Kurlar yükleniyor...",
+        error: "Kur yüklenemedi.",
+        updated: "Güncellendi",
+        footer: "Kurlar otomatik güncellenir",
+        theme: "Tema"
+    },
+
+    cs: {
+        flag: "🇨🇿",
+        name: "Čeština",
+        title: "Převodník měn",
+        subtitle: "Rychlý a přesný převodník měn",
+        amount: "Částka",
+        from: "Z měny",
+        to: "Na měnu",
+        result: "Výsledek",
+        rate: "Kurz",
+        search: "Hledat měnu...",
+        loading: "Načítání kurzů...",
+        error: "Kurz se nepodařilo načíst.",
+        updated: "Aktualizováno",
+        footer: "Kurzy se aktualizují automaticky",
+        theme: "Motiv"
+    },
+
+    sk: {
+        flag: "🇸🇰",
+        name: "Slovenčina",
+        title: "Prevodník mien",
+        subtitle: "Rýchly a presný prevodník mien",
+        amount: "Suma",
+        from: "Z meny",
+        to: "Na menu",
+        result: "Výsledok",
+        rate: "Kurz",
+        search: "Hľadať menu...",
+        loading: "Načítavajú sa kurzy...",
+        error: "Kurz sa nepodarilo načítať.",
+        updated: "Aktualizované",
+        footer: "Kurzy sa aktualizujú automaticky",
+        theme: "Motív"
+    },
+
+    hu: {
+        flag: "🇭🇺",
+        name: "Magyar",
+        title: "Valutaváltó",
+        subtitle: "Gyors és pontos valutaváltó",
+        amount: "Összeg",
+        from: "Ebből",
+        to: "Erre",
+        result: "Eredmény",
+        rate: "Árfolyam",
+        search: "Pénznem keresése...",
+        loading: "Árfolyamok betöltése...",
+        error: "Nem sikerült betölteni az árfolyamot.",
+        updated: "Frissítve",
+        footer: "Az árfolyamok automatikusan frissülnek",
+        theme: "Téma"
+    },
+
+    ro: {
+        flag: "🇷🇴",
+        name: "Română",
+        title: "Convertor valutar",
+        subtitle: "Convertor rapid și precis",
+        amount: "Sumă",
+        from: "Din",
+        to: "În",
+        result: "Rezultat",
+        rate: "Curs",
+        search: "Caută moneda...",
+        loading: "Se încarcă cursurile...",
+        error: "Cursul nu a putut fi încărcat.",
+        updated: "Actualizat",
+        footer: "Cursurile se actualizează automat",
+        theme: "Temă"
+    },
+
+    bg: {
+        flag: "🇧🇬",
+        name: "Български",
+        title: "Валутен конвертор",
+        subtitle: "Бърз и точен валутен конвертор",
+        amount: "Сума",
+        from: "От валута",
+        to: "Към валута",
+        result: "Резултат",
+        rate: "Курс",
+        search: "Търсене на валута...",
+        loading: "Зареждане на курсове...",
+        error: "Курсът не може да бъде зареден.",
+        updated: "Актуализирано",
+        footer: "Курсовете се актуализират автоматично",
+        theme: "Тема"
+    },
+
+    el: {
+        flag: "🇬🇷",
+        name: "Ελληνικά",
+        title: "Μετατροπέας νομισμάτων",
+        subtitle: "Γρήγορος και ακριβής μετατροπέας",
+        amount: "Ποσό",
+        from: "Από",
+        to: "Σε",
+        result: "Αποτέλεσμα",
+        rate: "Ισοτιμία",
+        search: "Αναζήτηση νομίσματος...",
+        loading: "Φόρτωση ισοτιμιών...",
+        error: "Δεν ήταν δυνατή η φόρτωση.",
+        updated: "Ενημερώθηκε",
+        footer: "Οι ισοτιμίες ενημερώνονται αυτόματα",
+        theme: "Θέμα"
+    },
+
+    sv: {
+        flag: "🇸🇪",
+        name: "Svenska",
+        title: "Valutaomvandlare",
+        subtitle: "Snabb och exakt valutaomvandlare",
+        amount: "Belopp",
+        from: "Från",
+        to: "Till",
+        result: "Resultat",
+        rate: "Kurs",
+        search: "Sök valuta...",
+        loading: "Laddar kurser...",
+        error: "Kursen kunde inte laddas.",
+        updated: "Uppdaterad",
+        footer: "Kurser uppdateras automatiskt",
+        theme: "Tema"
+    },
+
+    da: {
+        flag: "🇩🇰",
+        name: "Dansk",
+        title: "Valutaomregner",
+        subtitle: "Hurtig og præcis valutaomregner",
+        amount: "Beløb",
+        from: "Fra",
+        to: "Til",
+        result: "Resultat",
+        rate: "Kurs",
+        search: "Søg valuta...",
+        loading: "Indlæser kurser...",
+        error: "Kunne ikke indlæse kurs.",
+        updated: "Opdateret",
+        footer: "Kurser opdateres automatisk",
+        theme: "Tema"
+    },
+
+    no: {
+        flag: "🇳🇴",
+        name: "Norsk",
+        title: "Valutakalkulator",
+        subtitle: "Rask og nøyaktig valutakalkulator",
+        amount: "Beløp",
+        from: "Fra",
+        to: "Til",
+        result: "Resultat",
+        rate: "Kurs",
+        search: "Søk etter valuta...",
+        loading: "Laster kurser...",
+        error: "Kunne ikke laste kurs.",
+        updated: "Oppdatert",
+        footer: "Kursene oppdateres automatisk",
+        theme: "Tema"
+    },
+
+    fi: {
+        flag: "🇫🇮",
+        name: "Suomi",
+        title: "Valuuttamuunnin",
+        subtitle: "Nopea ja tarkka valuuttamuunnin",
+        amount: "Summa",
+        from: "Lähtövaluutta",
+        to: "Kohdevaluutta",
+        result: "Tulos",
+        rate: "Kurssi",
+        search: "Hae valuuttaa...",
+        loading: "Ladataan kursseja...",
+        error: "Kurssia ei voitu ladata.",
+        updated: "Päivitetty",
+        footer: "Kurssit päivittyvät automaattisesti",
+        theme: "Teema"
+    },
+
+    ja: {
+        flag: "🇯🇵",
+        name: "日本語",
+        title: "通貨換算",
+        subtitle: "高速で正確な通貨コンバーター",
+        amount: "金額",
+        from: "換算元",
+        to: "換算先",
+        result: "結果",
+        rate: "為替レート",
+        search: "通貨を検索...",
+        loading: "レートを読み込み中...",
+        error: "レートを取得できませんでした。",
+        updated: "更新",
+        footer: "為替レートは自動更新されます",
+        theme: "テーマ"
+    },
+
+    ko: {
+        flag: "🇰🇷",
+        name: "한국어",
+        title: "환율 계산기",
+        subtitle: "빠르고 정확한 환율 계산기",
+        amount: "금액",
+        from: "변환할 통화",
+        to: "변환될 통화",
+        result: "결과",
+        rate: "환율",
+        search: "통화 검색...",
+        loading: "환율을 불러오는 중...",
+        error: "환율을 불러오지 못했습니다.",
+        updated: "업데이트",
+        footer: "환율은 자동으로 업데이트됩니다",
+        theme: "테마"
+    }
+
+};
+
+
+/* =====================================================
+   ТЕМИ
+===================================================== */
+
+const themes = {
+    dark: "🌙 Dark",
+    ocean: "🌊 Ocean",
+    forest: "🌿 Forest",
+    sunset: "🌅 Sunset",
+    royal: "👑 Royal",
+    light: "☀️ Light"
+};
+
+
+/* =====================================================
+   40 ВАЛЮТ
+===================================================== */
+
+const currencyData = {
+
+    USD:["🇺🇸","US Dollar"],
+    EUR:["🇪🇺","Euro"],
+    UAH:["🇺🇦","Ukrainian Hryvnia"],
+    GBP:["🇬🇧","British Pound"],
+    PLN:["🇵🇱","Polish Zloty"],
+    CHF:["🇨🇭","Swiss Franc"],
+    CAD:["🇨🇦","Canadian Dollar"],
+    AUD:["🇦🇺","Australian Dollar"],
+    JPY:["🇯🇵","Japanese Yen"],
+    CNY:["🇨🇳","Chinese Yuan"],
+
+    CZK:["🇨🇿","Czech Koruna"],
+    SEK:["🇸🇪","Swedish Krona"],
+    NOK:["🇳🇴","Norwegian Krone"],
+    DKK:["🇩🇰","Danish Krone"],
+    HUF:["🇭🇺","Hungarian Forint"],
+    RON:["🇷🇴","Romanian Leu"],
+    BGN:["🇧🇬","Bulgarian Lev"],
+    TRY:["🇹🇷","Turkish Lira"],
+    ILS:["🇮🇱","Israeli Shekel"],
+    AED:["🇦🇪","UAE Dirham"],
+
+    SAR:["🇸🇦","Saudi Riyal"],
+    INR:["🇮🇳","Indian Rupee"],
+    KRW:["🇰🇷","South Korean Won"],
+    SGD:["🇸🇬","Singapore Dollar"],
+    HKD:["🇭🇰","Hong Kong Dollar"],
+    NZD:["🇳🇿","New Zealand Dollar"],
+    MXN:["🇲🇽","Mexican Peso"],
+    BRL:["🇧🇷","Brazilian Real"],
+    ZAR:["🇿🇦","South African Rand"],
+    THB:["🇹🇭","Thai Baht"],
+
+    IDR:["🇮🇩","Indonesian Rupiah"],
+    MYR:["🇲🇾","Malaysian Ringgit"],
+    PHP:["🇵🇭","Philippine Peso"],
+    VND:["🇻🇳","Vietnamese Dong"],
+    ISK:["🇮🇸","Icelandic Krona"],
+    GEL:["🇬🇪","Georgian Lari"],
+    RSD:["🇷🇸","Serbian Dinar"],
+    KZT:["🇰🇿","Kazakhstani Tenge"],
+    EGP:["🇪🇬","Egyptian Pound"],
+    CLP:["🇨🇱","Chilean Peso"]
+};
+
+
+/* =====================================================
+   СТАН
+===================================================== */
+
+let rates = {};
+let currentLanguage =
+    localStorage.getItem("language") || "uk";
+
+let currentTheme =
+    localStorage.getItem("theme") || "dark";
+
+
+const languageSelect =
+    document.getElementById("language");
+
+const themeSelect =
+    document.getElementById("theme");
+
+const fromSelect =
+    document.getElementById("from");
+
+const toSelect =
+    document.getElementById("to");
+
+const amount =
+    document.getElementById("amount");
+
+
+/* =====================================================
+   МОВИ
+===================================================== */
+
+function setupLanguages() {
+
+    languageSelect.innerHTML = "";
+
+    for (const code in languages) {
+
+        const lang = languages[code];
+
+        languageSelect.add(
+            new Option(
+                `${lang.flag} ${lang.name}`,
+                code
+            )
+        );
+    }
+
+    languageSelect.value = currentLanguage;
+}
+
+
+/* =====================================================
+   ТЕМИ
+===================================================== */
+
+function setupThemes() {
+
+    themeSelect.innerHTML = "";
+
+    for (const key in themes) {
+
+        themeSelect.add(
+            new Option(
+                themes[key],
+                key
+            )
+        );
+    }
+
+    themeSelect.value = currentTheme;
+
+    applyTheme();
+}
+
+
+function applyTheme() {
+
+    document.body.className = "";
+
+    if (currentTheme !== "dark") {
+        document.body.classList.add(
+            `theme-${currentTheme}`
+        );
+    }
+}
+
+
+function changeTheme() {
+
+    currentTheme =
+        themeSelect.value;
+
+    localStorage.setItem(
+        "theme",
+        currentTheme
+    );
+
+    applyTheme();
+}
+
+
+/* =====================================================
+   ПЕРЕКЛАД ІНТЕРФЕЙСУ
+===================================================== */
+
+function changeLanguage() {
+
+    currentLanguage =
+        languageSelect.value;
+
+    localStorage.setItem(
+        "language",
+        currentLanguage
+    );
+
+    const t =
+        languages[currentLanguage];
+
+    document.documentElement.lang =
+        currentLanguage;
+
+    document.getElementById("title")
+        .textContent = `💱 ${t.title}`;
+
+    document.getElementById("subtitle")
+        .textContent = t.subtitle;
+
+    document.getElementById("amountLabel")
+        .textContent = t.amount;
+
+    document.getElementById("fromLabel")
+        .textContent = t.from;
+
+    document.getElementById("toLabel")
+        .textContent = t.to;
+
+    document.getElementById("resultLabel")
+        .textContent = t.result;
+
+    document.getElementById("search")
+        .placeholder = t.search;
+
+    document.getElementById("footer")
+        .textContent = t.footer;
+
+    renderCurrencies();
+
+    convert();
+}
+
+
+/* =====================================================
+   ВАЛЮТИ
+===================================================== */
+
+function renderCurrencies() {
+
+    const oldFrom =
+        fromSelect.value || "UAH";
+
+    const oldTo =
+        toSelect.value || "EUR";
+
+    fromSelect.innerHTML = "";
+    toSelect.innerHTML = "";
+
+    const search =
+        document.getElementById("search")
+            .value
+            .toLowerCase()
+            .trim();
+
+
+    for (const code in currencyData) {
+
+        const [flag, englishName] =
+            currencyData[code];
+
+        /*
+          Назви показуємо мовою інтерфейсу.
+          Якщо перекладу немає — залишаємо
+          англійську назву.
+        */
+
+        const names = {
+            uk: {
+                USD:"Долар США",
+                EUR:"Євро",
+                UAH:"Українська гривня",
+                GBP:"Фунт стерлінгів",
+                PLN:"Польський злотий",
+                JPY:"Японська єна",
+                CNY:"Китайський юань",
+                CHF:"Швейцарський франк"
+            },
+            en: {},
+            pl: {},
+            de: {},
+            fr: {}
+        };
+
+        const translated =
+            names[currentLanguage]?.[code]
+            || englishName;
+
+        const searchable =
+            `${code} ${translated} ${englishName}`
+                .toLowerCase();
+
+        if (
+            search &&
+            !searchable.includes(search)
+        ) {
+            continue;
+        }
+
+        const text =
+            `${flag} ${code} — ${translated}`;
+
+        fromSelect.add(
+            new Option(text, code)
+        );
+
+        toSelect.add(
+            new Option(text, code)
+        );
+    }
+
+    /*
+      Після пошуку можемо тимчасово
+      не мати потрібної валюти.
+    */
+
+    if (
+        [...fromSelect.options]
+            .some(o => o.value === oldFrom)
+    ) {
+        fromSelect.value = oldFrom;
+    }
+
+    if (
+        [...toSelect.options]
+            .some(o => o.value === oldTo)
+    ) {
+        toSelect.value = oldTo;
+    }
+
+    if (!fromSelect.value) {
+        fromSelect.selectedIndex = 0;
+    }
+
+    if (!toSelect.value) {
+        toSelect.selectedIndex = 0;
+    }
+}
+
+
+/* =====================================================
+   ПОШУК
+===================================================== */
+
+function filterCurrencies() {
+
+    renderCurrencies();
+}
+
+
+/* =====================================================
+   ОТРИМАННЯ РЕАЛЬНИХ КУРСІВ
+===================================================== */
+
+async function loadRates() {
+
+    const status =
+        document.getElementById("status");
+
+    const t =
+        languages[currentLanguage];
+
+    status.textContent =
+        t.loading;
+
+    try {
+
+        /*
+          Frankfurter дозволяє отримати
+          курси відносно EUR без API key.
+        */
+
+        const response =
+            await fetch(
+                "https://api.frankfurter.dev/v2/rates?base=EUR"
+            );
+
+        if (!response.ok) {
+            throw new Error("API error");
+        }
+
+        const data =
+            await response.json();
+
+        rates = {
+            EUR: 1
+        };
+
+        data.forEach(item => {
+
+            if (
+                currencyData[item.quote]
+            ) {
+                rates[item.quote] =
+                    Number(item.rate);
+            }
+
+        });
+
+        status.textContent = "";
+
+        convert();
+
+    } catch (error) {
+
+        console.error(error);
+
+        status.textContent =
+            t.error;
+    }
+}
+
+
+/* =====================================================
+   КОНВЕРТАЦІЯ
+===================================================== */
+
+function convert() {
+
+    const value =
+        Number(amount.value);
+
+    const from =
+        fromSelect.value;
+
+    const to =
+        toSelect.value;
+
+    if (
+        !from ||
+        !to ||
+        !rates[from] ||
+        !rates[to] ||
+        !Number.isFinite(value)
+    ) {
+        document.getElementById("result")
+            .textContent = "—";
+
+        return;
+    }
+
+    /*
+      Обидва курси відносно EUR.
+
+      Наприклад:
+
+      USD → EUR
+      USD rate = 1.13
+      EUR rate = 1
+
+      Спочатку USD → EUR,
+      потім EUR → потрібна валюта.
+    */
+
+    const inEUR =
+        value / rates[from];
+
+    const result =
+        inEUR * rates[to];
+
+    const one =
+        rates[to] / rates[from];
+
+
+    const formatter =
+        new Intl.NumberFormat(
+            currentLanguage,
+            {
+                maximumFractionDigits: 6
+            }
+        );
+
+
+    document.getElementById("result")
+        .textContent =
+        `${formatter.format(result)} ${to}`;
+
+
+    document.getElementById("rate")
+        .textContent =
+        `${languages[currentLanguage].rate}: 1 ${from} = ${formatter.format(one)} ${to}`;
+
+
+    /*
+      Frankfurter повертає дату в кожному
+      записі. Для простоти беремо дату
+      першого курсу.
+    */
+
+    const firstRate =
+        Object.keys(rates).length;
+
+    document.getElementById("updated")
+        .textContent =
+        firstRate > 0
+        ? languages[currentLanguage].updated
+        : "";
+}
+
+
+/* =====================================================
+   SWAP
+===================================================== */
+
+function swapCurrencies() {
+
+    const oldFrom =
+        fromSelect.value;
+
+    fromSelect.value =
+        toSelect.value;
+
+    toSelect.value =
+        oldFrom;
+
+    convert();
+}
+
+
+/* =====================================================
+   ЗАПУСК
+===================================================== */
+
+setupLanguages();
+
+setupThemes();
+
+renderCurrencies();
+
+fromSelect.value = "UAH";
+toSelect.value = "EUR";
+
+changeLanguage();
+
+loadRates();
+
+</script>
+
+</body>
+</html>
+
